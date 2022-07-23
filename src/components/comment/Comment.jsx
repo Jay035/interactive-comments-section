@@ -9,17 +9,20 @@ import { DeleteBtn } from './DeleteBtn';
 import { Reply } from './Reply';
 import { CommentForm } from './CommentForm';
 import { Rating } from './Rating';
+import { useState } from 'react';
+// import { updateComment } from '../data';
 
 export const Comment = ({ 
     comment, replies, currentUserId, 
     currentUser, deleteComment, activeComment,
     setActiveComment, addComment, parentId = null,
+    updateComment
 }) => {
     // console.log(currentUser.username)
     const isYou = comment.user.username === currentUser.username,
-          tenMinutes = 3600000,
-          timePassed = new Date() - new Date(comment.createdAt) > tenMinutes,
-          canReply = Boolean(currentUserId),
+        //   tenMinutes = 3600000,
+        //   timePassed = new Date() - new Date(comment.createdAt) > tenMinutes,
+        //   canReply = Boolean(currentUserId),
         //   canEdit = currentUserId === comment.userId && !timePassed,
         //   canEdit = currentUser.username === comment.user.username,
         //   canDelete = currentUserId === comment.userId && !timePassed,
@@ -32,6 +35,7 @@ export const Comment = ({
           isEditing = activeComment && 
                       activeComment.type === "editing" && 
                       activeComment.id === comment.id;
+    const [like, setLike] = useState(comment.score)
     const replyId = parentId ? parentId : comment.id;
     // console.log(canEdit)
                     
@@ -49,8 +53,8 @@ export const Comment = ({
                             </div>
                             
                             <p className="postTime flex">
-                                <span>{dayCommentIsCreatedAt}</span>
-                                <span>{timeCommentIsCreatedAt}</span>
+                                <span className='date'>{dayCommentIsCreatedAt}</span>
+                                <span className='time'>{timeCommentIsCreatedAt}</span>
                             </p>
                         </section>
                         <section id='comment__actions--desktop' className='comment--actions flex justify-between align-center'>
@@ -60,13 +64,23 @@ export const Comment = ({
                         </section>
                     </div>
                     {!isEditing && <div className="comment">{ comment.content }</div>}
+                    {isEditing && (
+                        <CommentForm 
+                            submitLabel="UPDATE"
+                            active
+                            initialText={comment.content}
+                            handleSubmit={(text) => updateComment(text, comment.id)}
+                            handleCancel={() => setActiveComment(null)}
+                            currentUser={currentUser}
+                        />
+                    )}
                 </div>
                 <div className="likes_reply_group flex justify-between align-center">
-                    <Rating comment={comment} />
+                    <Rating comment={comment} like={like} setLike={setLike} />
                     <section className='comment--actions flex justify-between align-center'>
-                        { !isYou && <ReplyBtn comment={comment} replies={replies} handleReply={() => setActiveComment({ id: comment.id, type: 'replying'})} />}
+                        { !isYou && <ReplyBtn handleReply={() => setActiveComment({ id: comment.id, type: 'replying'})} />}
                         { isYou && <DeleteBtn handleDelete={() => deleteComment(comment.id)} />}
-                        { isYou && <EditBtn comment={comment} replies={replies} handleEdit={() => setActiveComment({ id: comment.id, type: 'editing'})} />}
+                        { isYou && <EditBtn handleEdit={() => setActiveComment({ id: comment.id, type: 'editing'})} />}
                     </section>
                     
                 </div>
@@ -87,9 +101,12 @@ export const Comment = ({
                                     deleteReply={deleteComment}
                                     currentUser={currentUser}
                                     activeReply={activeComment}
-                                    // setActiveComment={setActiveComment}
+                                    setActiveComment={setActiveComment}
                                     parentId={comment.id}
                                     addReply={addComment}
+                                    like={like} 
+                                    setLike={setLike}
+                                    updateComment={updateComment}
                                     handleReply={() => setActiveComment({ id: reply.id, type: 'replying'})}
                                     handleEdit={() => setActiveComment({ id: reply.id, type: 'editing'})}
                                 />

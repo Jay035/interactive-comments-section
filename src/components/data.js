@@ -85,6 +85,7 @@ export const createComment = async (text, parentId = null) => {
     content: text,
     parentId,
     userId: "1",
+    score: 0,
     // replyingTo,
     user: {
       image: { 
@@ -93,7 +94,7 @@ export const createComment = async (text, parentId = null) => {
       username: "juliusomo"
     },
     createdAt: new Date().toISOString(),
-    score: "0",
+    
   }
 }
 

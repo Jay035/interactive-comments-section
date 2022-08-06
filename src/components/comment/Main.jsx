@@ -6,7 +6,6 @@ import {
     updateComment as updateCommentContent } from "../data";
 import { Comment } from "./Comment";
 import { CommentForm } from "./CommentForm";
-// import swal from "@sweetalert/with-react";
 
 
 export const Main = ({currentUserId}) => {
@@ -14,7 +13,7 @@ export const Main = ({currentUserId}) => {
           currentUser = currentUserData,
           [commentsApiData, setCommentsApiData] = useState([]),
           rootComments = commentsApiData.filter(commentsData => commentsData.parentId === null);
-    // console.log(rootComments)
+
     const getReplies = commentId => {
         return commentsApiData.filter(commentData => commentData.parentId === commentId)
     }
@@ -35,11 +34,7 @@ export const Main = ({currentUserId}) => {
                 (commentsData) => commentsData.id !== commentId
             )
             setCommentsApiData(updatedCommentsApiData);
-            // hide modal 
-            const modalBackdrop = document.querySelector('.modal-backdrop.show')
-            modalBackdrop.classList.remove('show');
-            modalBackdrop.classList.add('hidden');
-            document.body.classList.remove('modal-open');
+           
         })
     }
 
@@ -62,6 +57,7 @@ export const Main = ({currentUserId}) => {
             setCommentsApiData(data);
         });
     }, []);
+
   return (
     <div className="wrapper">
         {
@@ -78,7 +74,6 @@ export const Main = ({currentUserId}) => {
                         setActiveComment={setActiveComment}
                         addComment={addComment}
                         updateComment={updateComment}
-                        // editComment={editComment}
                     />
                 </div>
             ))

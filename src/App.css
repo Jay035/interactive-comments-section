@@ -76,10 +76,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Rubik', sans-serif;
 }
 
 body{
-  font-family: 'Rubik', sans-serif;
   background-color:var(--Light-gray);
   padding-block: 2em;
   line-height: 1.5;
@@ -126,6 +126,12 @@ h1{
   color: black !important;
   font-size: 1.1em;
   opacity: 1;
+}
+
+button{
+  border: none;
+  font-size: 1em;
+  background-color: transparent;
 }
 
 /* 'you' label */
@@ -246,6 +252,48 @@ h1{
   padding: 10px;
   margin-bottom: 15px;
 }
+
+/* ------------------- MODAL ------------------- */
+.swal-modal,
+.swal-title{
+  text-align: left;
+}
+
+.swal-title:first-child{
+  margin-top: 10px;
+}
+
+.swal-title{
+  color: var(--Dark-blue);
+  font-size: 20px;
+  margin-block: 0;
+}
+
+.swal-content{
+  color: var(--Grayish-Blue);
+  margin-top: 0;
+}
+
+.swal-button-container button{
+  color: var(--White);
+}
+
+.swal-button-container:nth-child(1) button{
+  background-color: var(--Grayish-Blue);
+}
+
+.swal-button-container:nth-child(1) button:hover{
+  background-color: hsla(211, 10%, 45%, 0.8);
+}
+
+.swal-button-container:nth-child(2) button{
+  background-color: var(--Soft-Red);
+}
+
+.swal-button-container:nth-child(2) button:hover{
+  background-color: hsla(358, 79%, 66%, 0.8);
+}
+
 
 /* Footer  */
 

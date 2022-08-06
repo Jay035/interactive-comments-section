@@ -35,7 +35,7 @@ function App() {
       {/* {isPending && <div className="container">Loading...</div>}
       {comments && <Comment comments={comments} handleDelete={handleDelete} />} */}
       <main>
-        <Main currentUserId="1" />
+        <Main />
       </main>
       <Footer />
     </div>

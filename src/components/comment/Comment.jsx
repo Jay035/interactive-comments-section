@@ -10,16 +10,16 @@ import { Reply } from './Reply';
 import { CommentForm } from './CommentForm';
 import { Rating } from './Rating';
 import { useState } from 'react';
+import { UserAuth } from '../../context/AuthContext';
 // import { updateComment } from '../data';
 
 export const Comment = ({ 
-    comment, replies, currentUserId, 
-    currentUser, deleteComment, activeComment,
-    setActiveComment, addComment, parentId = null,
-    updateComment
+    comment, replies, currentUser, 
+    deleteComment, activeComment, setActiveComment, 
+    addComment, parentId = null, updateComment
 }) => {
-    // console.log(currentUser.username)
-    const isYou = comment.user.username === currentUser.username,
+    const { user } = UserAuth();
+    const isYou = comment.userDetails.username === user.email,
         //   tenMinutes = 3600000,
         //   timePassed = new Date() - new Date(comment.createdAt) > tenMinutes,
         //   canReply = Boolean(currentUserId),
@@ -46,9 +46,9 @@ export const Comment = ({
                 <div className="content--container">
                     <div className="comment--title flex justify-between align-center">
                         <section className="flex align-center">
-                            <img src={comment.user.image.png} alt="avatar" className="avatar"/>
+                            <img src={comment.userDetails.image.png} alt="avatar" className="avatar"/>
                             <div className="name flex align-center">
-                                <h1 className="font-bold">{ comment.user.username }</h1>
+                                <h1 className="font-bold">{ comment.userDetails.username }</h1>
                                 {isYou && <span className='you'>you</span>}
                             </div>
                             
@@ -76,11 +76,11 @@ export const Comment = ({
                     )}
                 </div>
                 <div className="likes_reply_group flex justify-between align-center">
-                    <Rating comment={comment} like={like} setLike={setLike} />
+                    { (!isEditing || !isReplying) && <Rating comment={comment} like={like} setLike={setLike} />}
                     <section className='comment--actions flex justify-between align-center'>
-                        { !isYou && <ReplyBtn handleReply={() => setActiveComment({ id: comment.id, type: 'replying'})} />}
+                        { !isYou && !isReplying && <ReplyBtn handleReply={() => setActiveComment({ id: comment.id, type: 'replying'})} />}
                         { isYou && <DeleteBtn handleDelete={() => deleteComment(comment.id)} />}
-                        { isYou && <EditBtn handleEdit={() => setActiveComment({ id: comment.id, type: 'editing'})} />}
+                        { isYou && !isEditing && <EditBtn handleEdit={() => setActiveComment({ id: comment.id, type: 'editing'})} />}
                     </section>
                     
                 </div>

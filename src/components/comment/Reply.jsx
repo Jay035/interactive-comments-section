@@ -4,6 +4,7 @@ import { DeleteBtn } from './DeleteBtn';
 import { CommentForm } from './CommentForm';
 import { Rating } from './Rating';
 import { useState } from 'react';
+import { UserAuth } from '../../context/AuthContext';
 
 export const Reply = ({
     reply, comment, deleteReply,
@@ -11,8 +12,8 @@ export const Reply = ({
     activeReply, parentId = comment.id, 
     addReply, updateComment, setActiveComment
 }) => {
-
-    const isYou = reply.user.username === currentUser.username;
+    const {user} = UserAuth();
+    const isYou = reply.userDetails.username === user.email;
     const isReplying = activeReply && 
                        activeReply.type === "replying" && 
                        activeReply.id === reply.id;
@@ -22,16 +23,16 @@ export const Reply = ({
                       activeReply.id === reply.id;
     const replyId = parentId ? parentId : comment.id,
           [like, setLike] = useState(reply.score),
-          replyingTo = comment.user.username;
+          replyingTo = comment.userDetails.username;
   return (
     <>
     <div key={reply.id} className="container">
         <div className="content--container">
             <div className="comment--title flex justify-between align-center">
                 <section className="flex align-center">
-                    <img src={reply.user.image.png} alt="avatar" className="avatar"/>
+                    <img src={reply.userDetails.image.png} alt="avatar" className="avatar"/>
                     <div className="name flex align-center">
-                        <h1 className="font-bold">{ reply.user.username }</h1>
+                        <h1 className="font-bold">{ reply.userDetails.username }</h1>
                         {isYou && <span className='you'>you</span>}
                     </div>
                     <p className="postTime flex">
@@ -40,9 +41,9 @@ export const Reply = ({
                     </p>
                 </section>
                 <section className='comment--actions flex justify-between align-center'>
-                    { !isYou && <ReplyBtn handleReply={handleReply} />}
-                    { isYou && <DeleteBtn handleDelete={() => deleteReply(reply.id)} />}
-                    { isYou && <EditBtn handleEdit={handleEdit} />}
+                    { !isYou && !isReplying && <ReplyBtn handleReply={handleReply} />}
+                    { isYou && <DeleteBtn handleDelete={() => deleteReply(reply.id)} /> }
+                    { isYou && !isEditing && <EditBtn handleEdit={handleEdit} />}
                 </section>
             </div>
             {/* <div className="comment"><span className='replyingTo font-bold'>@{reply.replyingTo} </span>{ reply.content }</div> */}
@@ -62,9 +63,9 @@ export const Reply = ({
         <div className="likes_reply_group flex justify-between align-center">
             <Rating like={like} setLike={setLike} />
             <section className='comment--actions flex justify-between align-center'>
-                {!isYou && <ReplyBtn comment={comment} handleReply={handleReply} />}
-                { isYou && <DeleteBtn comment={comment} handleDelete={() => deleteReply(reply.id)} />}
-                { isYou && <EditBtn comment={comment} handleEdit={handleEdit} />}
+                { !isYou && !isReplying && <ReplyBtn comment={comment} handleReply={handleReply} />}
+                { isYou && <DeleteBtn handleDelete={() => deleteReply(reply.id)} /> }
+                { isYou && !isEditing && <EditBtn comment={comment} handleEdit={handleEdit} />}
             </section>
         </div>
     </div>

@@ -57,6 +57,10 @@
   display: none;
 }
 
+.text-center{
+  text-align: center;
+}
+
 .block{
   display: block;
 }
@@ -83,11 +87,32 @@ body{
   background-color:var(--Light-gray);
   padding-block: 2em;
   line-height: 1.5;
+  /* add a scrollbar  */
+}
+
+.App{
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .wrapper{
   max-width: 900px;
   margin-inline: auto;
+}
+
+.user-details{
+  width: 95%;
+  margin-inline: auto;
+  margin-bottom: 2em;
+}
+
+.user-details button{
+  width: 30%;
+  max-width: 200px;
+  margin-inline: unset;
 }
 
 .container{
@@ -230,11 +255,14 @@ button{
   gap: 10px;
 }
 
-.comment__form--button{
+.form-button{
   background-color: var(--Moderate-blue);
   color: var(--White);
   cursor: pointer;
   padding: .5rem 1.1rem;
+  width: 100%;
+  max-width: 300px;
+  margin-inline: auto;
   border-radius: 8px;
   border: none;
 }
@@ -244,14 +272,53 @@ button{
 }
 
 /* comment--textarea */
-#comment__form--mobile #comment--textarea{
+#comment__form--mobile textarea,
+#comment__form--desktop textarea{
   width: 100%;
+  padding: 5px;
 }
 
 #comment--textarea{
   padding: 10px;
   margin-bottom: 15px;
 }
+
+/* --------------------------------------------------- */
+/* LOGIN and SIGNUP forms */
+.form.container{
+  max-width: 700px;
+}
+
+.form.container .title{
+  margin-bottom: 1em;
+}
+
+.form h1{
+  font-size: 1.5rem;
+}
+
+.form.container > div{
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.form.container input{
+  padding: .5em;
+}
+
+/* form submit buttons */
+.form.container .form-button{
+  margin-top: 10px;
+}
+
+.form span{
+  color: var(--Moderate-blue);
+}
+/* .form{
+  width: 400px;
+  margin-inline: auto;
+  margin-block: 2em;
+} */
 
 /* ------------------- MODAL ------------------- */
 .swal-modal,
@@ -323,6 +390,11 @@ a:hover{
   main{
     margin-top: 3em;
   }
+
+  .App{
+    display: unset;
+  }
+
   .container{
     display: flex;
     flex-direction: row-reverse;
@@ -383,6 +455,15 @@ a:hover{
 
   #comment--textarea{
     width: 100%;
+  }
+
+  .form.container{
+    justify-content: center;
+  }
+
+  .form.container div{
+    width: 90%;
+    max-width: 700px;
   }
 
   footer{

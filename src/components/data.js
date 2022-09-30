@@ -2,6 +2,7 @@ import juliusomoAvatar from './assets/avatars/image-juliusomo.png';
 import amyrobsonAvatar from './assets/avatars/image-amyrobson.png';
 import maxBlagunAvatar from './assets/avatars/image-maxblagun.png';
 import ramsesmironAvatar from './assets/avatars/image-ramsesmiron.png';
+import { UserAuth } from '../context/AuthContext';
 
 export const currentUser = [
   {
@@ -21,7 +22,7 @@ export const commentData = async () => {
       "content": "Impressive! Though it seems the drag feature could be improved. But overall it looks incredible. You've nailed the design and the responsiveness at various breakpoints works really well.",
       "createdAt": "2022-06-24T22:54:20.261Z",
       "score": 12,
-      "user": {
+      "userDetails": {
         "image": { 
           "png": amyrobsonAvatar,
           "webp": "./images/avatars/image-amyrobson.webp"
@@ -36,7 +37,7 @@ export const commentData = async () => {
       "content": "Woah, your project looks awesome! How long have you been coding for? I'm still new, but think I want to dive into React as well soon. Perhaps you can give me an insight on where I can learn React? Thanks!",
       "createdAt": "2022-06-28T12:34:20.261Z",
       "score": 5,
-      "user": {
+      "userDetails": {
         "image": { 
           "png": maxBlagunAvatar,
           "webp": "./images/avatars/image-maxblagun.webp"
@@ -52,7 +53,7 @@ export const commentData = async () => {
       "createdAt": "2022-07-11T22:44:20.261Z",
       "score": 4,
       "replyingTo": "maxblagun",
-      "user": {
+      "userDetails": {
         "image": { 
           "png": ramsesmironAvatar,
           "webp": "./images/avatars/image-ramsesmiron.webp"
@@ -68,7 +69,7 @@ export const commentData = async () => {
       "createdAt": "2022-07-14T23:43:07.900Z",
       "score": 2,
       "replyingTo": "ramsesmiron",
-      "user": {
+      "userDetails": {
         "image": { 
           "png": juliusomoAvatar,
           "webp": "./images/avatars/image-juliusomo.webp"
@@ -79,7 +80,10 @@ export const commentData = async () => {
   ]
 }
 
-export const createComment = async (text, parentId = null) => {
+
+export async function createComment (text, parentId = null) {
+  const { user } = UserAuth();
+  console.log(user.email)
   return {
     id: Math.random().toString(36).substr(2, 9),
     content: text,
@@ -87,11 +91,11 @@ export const createComment = async (text, parentId = null) => {
     userId: "1",
     score: 0,
     // replyingTo,
-    user: {
+    userDetails: {
       image: { 
         png: juliusomoAvatar,
       },
-      username: "juliusomo"
+      username: user.email
     },
     createdAt: new Date().toISOString(),
     

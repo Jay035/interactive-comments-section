@@ -1,34 +1,40 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserAuth } from "../context/AuthContext";
+import { auth, provider } from "../config/firebase";
+import { signInWithPopup } from 'firebase/auth';
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const { signIn } = UserAuth();
+  // const { signIn } = UserAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    try{
-      await signIn(email, password);
-      navigate('/main');
-    } catch(e){
-      console.log(e.message)
-    }
+  const signInWithGoogle = async () => {
+    const result = await signInWithPopup(auth, provider)
+    console.log(result)
+    navigate('/');
   }
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+  //   try{
+  //     await signIn(email, password);
+  //     navigate('/main');
+  //   } catch(e){
+  //     console.log(e.message)
+  //   }
+  // }
+
   return (
-    <form className="form container " onSubmit={handleSubmit}>
-      <div className="flex flex-col">
-        <div className="text-center title">
-          <h1>Welcome</h1>
-          <p>Sign in to your account</p>
-        </div>
+    // <form className="form container ">
+      <div className="login">
+        <h1>Sign In With Google To Continue</h1>
+        <button className="btn" onClick={signInWithGoogle}>Sign In With Google</button>
         {/* email */}
-        <div className="input flex flex-col">
+        {/* <div className="input flex flex-col">
           <label htmlFor="login-email">Email</label>
           <input
             type="email"
@@ -39,9 +45,9 @@ export const LoginForm = () => {
             }}
             required
           />
-        </div>
+        </div> */}
         {/* password */}
-        <div className="input flex flex-col">
+        {/* <div className="input flex flex-col">
           <label htmlFor="login-password">Password</label>
           <input
             type="password"
@@ -52,9 +58,9 @@ export const LoginForm = () => {
             }}
             required
           />
-        </div>
+        </div> */}
 
-        <div className="forgot-password flex justify-end cursor-pointer">
+        {/* <div className="forgot-password flex justify-end cursor-pointer">
           Forgot password?
         </div>
         <button className="form-button">SIGN IN</button>
@@ -66,8 +72,8 @@ export const LoginForm = () => {
           >
             Sign up
           </span>
-        </p>
+        </p> */}
       </div>
-    </form>
+    // </form>
   );
 };

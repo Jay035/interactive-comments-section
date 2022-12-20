@@ -5,6 +5,7 @@ import { CommentForm } from './CommentForm';
 import { Rating } from './Rating';
 import { useState } from 'react';
 import { UserAuth } from '../../context/AuthContext';
+import { auth } from '../../config/firebase';
 
 export const Reply = ({
     reply, comment, deleteReply,
@@ -12,8 +13,8 @@ export const Reply = ({
     activeReply, parentId = comment.id, 
     addReply, updateComment, setActiveComment
 }) => {
-    const {user} = UserAuth();
-    const isYou = reply.userDetails.username === user.email;
+    // const {user} = UserAuth();
+    const isYou = comment.userDetails.username === auth.currentUser?.displayName;
     const isReplying = activeReply && 
                        activeReply.type === "replying" && 
                        activeReply.id === reply.id;

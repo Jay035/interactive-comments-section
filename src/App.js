@@ -1,27 +1,28 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import { LoginForm } from "./components/LoginForm";
-import { SignUpForm } from "./components/SignUpForm";
-import { Main } from "./components/comment/Main";
-import { Footer } from "./Footer";
+import { LoginForm } from "./pages/LoginForm";
+import { Main } from "./pages/main/Main";
 import { AuthContextProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
+import AddComment from "./pages/addNewComment/AddComment";
 
 function App() {
   return (
     <div className="App">
-      <AuthContextProvider>
+      {/* <AuthContextProvider> */}
+      <Navbar />
         <Routes>
-          <Route path="/" element={<LoginForm />} />
-          <Route path="/signup" element={<SignUpForm />} />
-          <Route path="/main" element={
-            <ProtectedRoute>
-              <Main />
-            </ProtectedRoute>
+          <Route exact path="/" element={
+            // <ProtectedRoute>
+            <Main />
+            //  </ProtectedRoute> 
           } />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/addComment" element={<AddComment />} />
         </Routes>
-      </AuthContextProvider>
-      <Footer />
+      {/* </AuthContextProvider> */}
+      
     </div>
   );
 }

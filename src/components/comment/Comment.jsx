@@ -10,6 +10,7 @@ import { Reply } from './Reply';
 import { CommentForm } from './CommentForm';
 import { Rating } from './Rating';
 import { useState } from 'react';
+import { auth } from '../../config/firebase';
 import { UserAuth } from '../../context/AuthContext';
 // import { updateComment } from '../data';
 
@@ -18,8 +19,8 @@ export const Comment = ({
     deleteComment, activeComment, setActiveComment, 
     addComment, parentId = null, updateComment
 }) => {
-    const { user } = UserAuth();
-    const isYou = comment.userDetails.username === user.email,
+    // const { user } = UserAuth();
+    const isYou = comment.username === auth.currentUser?.displayName,
         //   tenMinutes = 3600000,
         //   timePassed = new Date() - new Date(comment.createdAt) > tenMinutes,
         //   canReply = Boolean(currentUserId),
@@ -35,8 +36,8 @@ export const Comment = ({
           isEditing = activeComment && 
                       activeComment.type === "editing" && 
                       activeComment.id === comment.id;
-    const [like, setLike] = useState(comment.score)
-    const replyId = parentId ? parentId : comment.id;
+    // const [like, setLike] = useState(comment.score)
+    // const replyId = parentId ? parentId : comment.id;
     // console.log(canEdit)
                     
           
@@ -46,9 +47,9 @@ export const Comment = ({
                 <div className="content--container">
                     <div className="comment--title flex justify-between align-center">
                         <section className="flex align-center">
-                            <img src={comment.userDetails.image.png} alt="avatar" className="avatar"/>
+                            <img src={auth.currentUser?.photoURL || ""} alt="avatar" className="avatar"/>
                             <div className="name flex align-center">
-                                <h1 className="font-bold">{ comment.userDetails.username }</h1>
+                                <h1 className="font-bold">@{ comment.username }</h1>
                                 {isYou && <span className='you'>you</span>}
                             </div>
                             
@@ -63,7 +64,7 @@ export const Comment = ({
                             { isYou && <EditBtn comment={comment} handleEdit={() => setActiveComment({ id: comment.id, type: 'editing'})} />}
                         </section>
                     </div>
-                    {!isEditing && <div className="comment">{ comment.content }</div>}
+                    {/* {!isEditing && <div className="comment">{ comment.content }</div>}
                     {isEditing && (
                         <CommentForm 
                             submitLabel="UPDATE"
@@ -73,10 +74,10 @@ export const Comment = ({
                             handleCancel={() => setActiveComment(null)}
                             currentUser={currentUser}
                         />
-                    )}
+                    )} */}
                 </div>
                 <div className="likes_reply_group flex justify-between align-center">
-                    { (!isEditing || !isReplying) && <Rating comment={comment} like={like} setLike={setLike} />}
+                    { (!isEditing || !isReplying) && <Rating comment={comment} />}
                     <section className='comment--actions flex justify-between align-center'>
                         { !isYou && !isReplying && <ReplyBtn handleReply={() => setActiveComment({ id: comment.id, type: 'replying'})} />}
                         { isYou && <DeleteBtn handleDelete={() => deleteComment(comment.id)} />}
@@ -85,7 +86,7 @@ export const Comment = ({
                     
                 </div>
             </div>
-            {isReplying && <CommentForm submitLabel={"Reply"} handleSubmit={(text) => addComment(text, replyId)} currentUser={currentUser} />}
+            {/* {isReplying && <CommentForm submitLabel={"Reply"} handleSubmit={(text) => addComment(text, replyId)} currentUser={currentUser} />} */}
             {
                 replies.length > 0 && (
                     <div className="replies">
@@ -104,8 +105,8 @@ export const Comment = ({
                                     setActiveComment={setActiveComment}
                                     parentId={comment.id}
                                     addReply={addComment}
-                                    like={like} 
-                                    setLike={setLike}
+                                    // like={like} 
+                                    // setLike={setLike}
                                     updateComment={updateComment}
                                     handleReply={() => setActiveComment({ id: reply.id, type: 'replying'})}
                                     handleEdit={() => setActiveComment({ id: reply.id, type: 'editing'})}

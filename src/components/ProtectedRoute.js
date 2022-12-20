@@ -1,11 +1,12 @@
 import { Navigate } from 'react-router-dom';
-import { UserAuth } from '../context/AuthContext';
+// import { UserAuth } from '../context/AuthContext';
+import { auth } from '../config/firebase';
 
 export default function ProtectedRoute({children}) {
-    const { user } = UserAuth();
+    // const { user } = UserAuth();
 
-    if(!user){
-        return <Navigate to="/" />
+    if(auth.currentUser){
+        return <Navigate to="/login" />
     }
   return children;
 }

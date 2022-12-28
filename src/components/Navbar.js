@@ -7,6 +7,7 @@ export default function Navbar() {
   const [user] = useAuthState(auth);
 
   const signUserOut = async () => {
+    // add a confirm modal 
     await signOut(auth);
   };
   

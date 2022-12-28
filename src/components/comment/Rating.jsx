@@ -1,8 +1,11 @@
+import PropTypes from 'prop-types';
 import plusIcon from "../assets/icon-plus.svg";
 import minusIcon from "../assets/icon-minus.svg";
 import { useState } from "react";
+import { UserAuth } from '../../context/AuthContext';
 
-export const Rating = ({ addLike, likes, unLike, hasUserLiked }) => {
+export const Rating = ({ likes, unLike, hasUserLiked }) => {
+  const { addLike } = UserAuth();
   // const increaseLikeCount = () => {
   //   setLike(prevValue =>  prevValue + 1)
   // }
@@ -22,7 +25,7 @@ export const Rating = ({ addLike, likes, unLike, hasUserLiked }) => {
         alt="icon plus"
         id="plus"
       />
-      <span id="like">{likes ? likes?.length : "0"}</span>
+      <span id="like">{likes ? likes : "0"}</span>
       <img
         onClick={unLike}
         className={` ${hasUserLiked ? `like-added` : ``} cursor-pointer`}
@@ -33,3 +36,8 @@ export const Rating = ({ addLike, likes, unLike, hasUserLiked }) => {
     </section>
   );
 };
+
+
+// Rating.propTypes = {
+//   likes: PropTypes.number
+// }

@@ -10,7 +10,7 @@ import AddComment from "./pages/addNewComment/AddComment";
 function App() {
   return (
     <div className="App">
-      {/* <AuthContextProvider> */}
+      <AuthContextProvider>
       <Navbar />
         <Routes>
           <Route exact path="/" element={
@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" element={<LoginForm />} />
           <Route path="/addComment" element={<AddComment />} />
         </Routes>
-      {/* </AuthContextProvider> */}
+      </AuthContextProvider>
       
     </div>
   );

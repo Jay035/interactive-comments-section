@@ -1,23 +1,38 @@
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useEffect } from "react";
+import { useState } from "react";
 import { DeleteBtn } from "../../components/comment/DeleteBtn";
 import { EditBtn } from "../../components/comment/EditBtn";
 import { Rating } from "../../components/comment/Rating";
 import { ReplyBtn } from "../../components/comment/ReplyBtn";
-import { auth } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
+import { UserAuth } from "../../context/AuthContext";
 
-export default function Reply({reply, handleReply, likes, addLike, unLike, hasUserLiked}) {
-    const isYou = reply.username === auth.currentUser?.displayName;
+export default function Reply({ reply, unLike, hasUserLiked, key, addLike }) {
+  const isYou = reply.username === auth.currentUser?.displayName;
+  const { handleReply } = UserAuth();
+  const [likes, setLikes] = useState(null);
+  const likesRef = collection(db, "likes");
 
-    const dayCommentIsCreatedAt = new Date(
-        reply.createdAt
-      ).toLocaleDateString();
-    
-      const timeCommentIsCreatedAt = new Date(
-        reply.createdAt
-      ).toLocaleTimeString();
+  const likesDoc = query(likesRef, where("commentId", "==", reply.userId));
+
+  const getLikes = async () => {
+    const data = await getDocs(likesDoc);
+    setLikes(data.docs.length);
+    console.log(likes)
+  };
+
+  const dayCommentIsCreatedAt = new Date(reply.createdAt).toLocaleDateString();
+
+  const timeCommentIsCreatedAt = new Date(reply.createdAt).toLocaleTimeString();
+
+  useEffect(() => {
+    getLikes();
+  }, []);
 
   return (
-    <div className="">
-        <div className="container" key={reply.id}>
+    <div className="replies">
+      <div className="container" key={key}>
         <div className="content--container">
           <div className="comment--title flex justify-between align-center">
             <section className="flex align-center">
@@ -40,9 +55,7 @@ export default function Reply({reply, handleReply, likes, addLike, unLike, hasUs
               id="comment__actions--desktop"
               className="comment--actions flex justify-between align-center"
             >
-              {!isYou && (
-                <ReplyBtn reply={reply} handleReply={handleReply} />
-              )}
+              {!isYou && <ReplyBtn reply={reply} handleReply={handleReply} />}
               {isYou && <DeleteBtn reply={reply} />}
               {isYou && <EditBtn reply={reply} />}
             </section>
@@ -52,7 +65,7 @@ export default function Reply({reply, handleReply, likes, addLike, unLike, hasUs
         <div className="likes_reply_group flex justify-between align-center">
           <Rating
             reply={reply}
-            addLike={addLike}
+            addLike={addLike(reply.userId)}
             likes={likes}
             unLike={unLike}
             hasUserLiked={hasUserLiked}
@@ -65,5 +78,5 @@ export default function Reply({reply, handleReply, likes, addLike, unLike, hasUs
         </div>
       </div>
     </div>
-  )
+  );
 }

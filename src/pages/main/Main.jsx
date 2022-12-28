@@ -1,5 +1,5 @@
 import { UserAuth } from "../../context/AuthContext";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
   commentData,
@@ -11,23 +11,38 @@ import {
 import { CommentForm } from "../../components/comment/CommentForm";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../../Footer";
-import { db } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
 import Comment from "./Comment";
 import Loading from "../Loading";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export const Main = () => {
   const [loading, setLoading] = useState(true);
   const [commentsList, setCommentsList] = useState([]);
   const commentsRef = collection(db, "posts");
-  const rootComments = commentsList?.filter(
-    (data) => data.parentId === "null"
-  );
-  console.log(commentsList)
-  console.log(rootComments)
+  const rootComments = commentsList?.filter((data) => data.parentId === "null");
+  const [user] = useAuthState(auth);
+  const navigate = useNavigate();
+
+  // const getReplies = (id) => {
+  //   return commentsList?.filter((data) => data.parentId === id)
+  // };
+
+  const likesRef = collection(db, "likes");
+
+  const addLike = async (commentId) => {
+    if (!user) {
+      navigate("/login");
+    }
+    await addDoc(likesRef, {
+      userId: user?.uid,
+      commentId: commentId,
+    });
+  };
 
   const getComments = async () => {
     const data = await getDocs(commentsRef);
-    setCommentsList(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    setCommentsList(data?.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
     setLoading((prevValue) => !prevValue);
   };
 
@@ -36,18 +51,12 @@ export const Main = () => {
     getComments();
   }, []);
 
-  const [activeComment, setActiveComment] = useState(null),
-    currentUser = currentUserData,
-    [commentsApiData, setCommentsApiData] = useState([]);
-    // rootComments = commentsApiData.filter(
-    //   (commentsData) => commentsData.parentId === null
-    // );
-
-  const getReplies = (commentId) => {
-    return commentsList?.filter(
-      (commentData) => commentData.parentId === commentId
-    );
-  };
+  // const [activeComment, setActiveComment] = useState(null),
+  //   currentUser = currentUserData,
+  //   [commentsApiData, setCommentsApiData] = useState([]);
+  // rootComments = commentsApiData.filter(
+  //   (commentsData) => commentsData.parentId === null
+  // );
 
   // add comment function
   // const addComment = (text, parentId) => {
@@ -59,27 +68,27 @@ export const Main = () => {
   // };
 
   // delete comment function
-  const deleteComment = (commentId) => {
-    deleteUserComment(commentId).then(() => {
-      const updatedCommentsApiData = commentsApiData.filter(
-        (commentsData) => commentsData.id !== commentId
-      );
-      setCommentsApiData(updatedCommentsApiData);
-    });
-  };
+  // const deleteComment = (commentId) => {
+  //   deleteUserComment(commentId).then(() => {
+  //     const updatedCommentsApiData = commentsApiData.filter(
+  //       (commentsData) => commentsData.id !== commentId
+  //     );
+  //     setCommentsApiData(updatedCommentsApiData);
+  //   });
+  // };
 
-  const updateComment = (text, commentId) => {
-    updateCommentContent(text, commentId).then(() => {
-      const updatedCommentsApiData = commentsApiData.map((commentData) => {
-        if (commentData.id === commentId) {
-          return { ...commentData, content: text };
-        }
-        return commentData;
-      });
-      setCommentsApiData(updatedCommentsApiData);
-      setActiveComment(null);
-    });
-  };
+  // const updateComment = (text, commentId) => {
+  //   updateCommentContent(text, commentId).then(() => {
+  //     const updatedCommentsApiData = commentsApiData.map((commentData) => {
+  //       if (commentData.id === commentId) {
+  //         return { ...commentData, content: text };
+  //       }
+  //       return commentData;
+  //     });
+  //     setCommentsApiData(updatedCommentsApiData);
+  //     setActiveComment(null);
+  //   });
+  // };
 
   // useEffect(() => {
   //   commentData().then((data) => {
@@ -102,13 +111,18 @@ export const Main = () => {
 
   return (
     <main className="wrapper">
-      {
-        loading ? <Loading /> : (
-          rootComments?.map((comment) => (
-            <Comment comment={comment} key={comment.id} replies={getReplies(rootComments.id)} />
-          ))
-        )
-      }
+      {loading ? (
+        <Loading />
+      ) : (
+        rootComments?.map((comment) => (
+          <Comment
+            comment={comment}
+            // replies={getReplies(commentId)}
+            commentsList={commentsList}
+            addLike={addLike}
+          />
+        ))
+      )}
 
       {/* {rootComments.map((rootComment) => (
         <div key={rootComment.id}>

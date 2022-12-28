@@ -1,6 +1,6 @@
+import PropTypes from "prop-types";
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
 import { DeleteBtn } from "../../components/comment/DeleteBtn";
@@ -8,10 +8,11 @@ import { EditBtn } from "../../components/comment/EditBtn";
 import { Rating } from "../../components/comment/Rating";
 import { ReplyBtn } from "../../components/comment/ReplyBtn";
 import { auth, db } from "../../config/firebase";
+import { UserAuth } from "../../context/AuthContext";
 import Reply from "./Reply";
 
-export default function Comment({ comment, replies }) {
-  const [user] = useAuthState(auth);
+export default function Comment({ comment, commentsList, addLike }) {
+  const { handleReply, user } = UserAuth();
   const navigate = useNavigate();
   const [likes, setLikes] = useState(null);
   const isYou = comment.username === auth.currentUser?.displayName;
@@ -24,42 +25,51 @@ export default function Comment({ comment, replies }) {
     comment.createdAt
   ).toLocaleTimeString();
 
+  const replies = commentsList?.filter(
+    (data) => data.parentId === comment.userId
+  );
+
   const likesRef = collection(db, "likes");
 
-  const likesDoc = query(likesRef, where("commentId", "==", comment.id));
+  const likesDoc = query(likesRef, where("commentId", "==", comment.userId));
 
   // like comment
-  const addLike = async () => {
-    if (!user) {
-      navigate("/login");
-    }
-    await addDoc(likesRef, {
-      userId: user?.uid,
-      commentId: comment.id,
-    });
-  };
-
+  // const addLike = async () => {
+  //   if (!user) {
+  //     navigate("/login");
+  //   }
+  //   await addDoc(likesRef, {
+  //     userId: user?.uid,
+  //     commentId: comment.id,
+  //   });
+  // };
+  
+  const hasUserLiked = likes?.find((like) => like.userId === user.uid);
+  
   // unlike a comment
   const unLike = () => {
     if (hasUserLiked) {
       setLikes(likes - 1);
+    } else if (!user) {
+      navigate("/login");
     }
   };
 
   // get number of likes
   const getLikes = async () => {
     const data = await getDocs(likesDoc);
-    setLikes(data.docs.docs?.map((doc) => ({ ...doc.data(), id: doc.id })));
+    setLikes(data.docs.length);
+    console.log(data.docs.length);
+    console.log(likes);
   };
 
-  const hasUserLiked = likes?.find((like) => like.userId === user.uid);
 
   // reply function
-  const handleReply = () => {
-    if (!user) {
-      navigate("/login");
-    }
-  };
+  // const handleReply = () => {
+  //   if (!user) {
+  //     navigate("/login");
+  //   }
+  // };
 
   useEffect(() => {
     getLikes();
@@ -67,7 +77,7 @@ export default function Comment({ comment, replies }) {
 
   return (
     <>
-      <div className="container" key={comment.id}>
+      <div className="container" key={comment.userId}>
         <div className="content--container">
           <div className="comment--title flex justify-between align-center">
             <section className="flex align-center">
@@ -102,7 +112,7 @@ export default function Comment({ comment, replies }) {
         <div className="likes_reply_group flex justify-between align-center">
           <Rating
             comment={comment}
-            addLike={addLike}
+            addLike={addLike(comment.userId)}
             likes={likes}
             unLike={unLike}
             hasUserLiked={hasUserLiked}
@@ -114,12 +124,13 @@ export default function Comment({ comment, replies }) {
           </section>
         </div>
       </div>
+
       {replies?.map((reply) => (
         <Reply
           reply={reply}
-          handleReply={handleReply}
+          key={reply.id}
           addLike={addLike}
-          likes={likes}
+          // handleReply={handleReply}
           unLike={unLike}
           hasUserLiked={hasUserLiked}
         />

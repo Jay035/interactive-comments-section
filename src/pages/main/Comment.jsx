@@ -1,5 +1,13 @@
 import PropTypes from "prop-types";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate } from "react-router-dom";
@@ -11,8 +19,8 @@ import { auth, db } from "../../config/firebase";
 import { UserAuth } from "../../context/AuthContext";
 import Reply from "./Reply";
 
-export default function Comment({ comment, commentsList, addLike }) {
-  const { handleReply, user } = UserAuth();
+export default function Comment({ comment, commentsList }) {
+  const { handleReply, user, addLike, newDoc } = UserAuth();
   const navigate = useNavigate();
   const [likes, setLikes] = useState(null);
   const isYou = comment.username === auth.currentUser?.displayName;
@@ -43,26 +51,58 @@ export default function Comment({ comment, commentsList, addLike }) {
   //     commentId: comment.id,
   //   });
   // };
-  
-  const hasUserLiked = likes?.find((like) => like.userId === user.uid);
-  
+
   // unlike a comment
-  const unLike = () => {
-    if (hasUserLiked) {
-      setLikes(likes - 1);
-    } else if (!user) {
-      navigate("/login");
-    }
-  };
+  // const unLike = () => {
+  //   if (hasUserLiked) {
+  //     console.log(hasUserLiked);
+  //     setLikes((prevValue) => prevValue.length - 1);
+  //     console.log(likes.length);
+  //     // console.log(likes);
+  //   } else if (!user) {
+  //     navigate("/login");
+  //   } else {
+  //     console.log("invalid");
+  //   }
+  // };
 
   // get number of likes
   const getLikes = async () => {
     const data = await getDocs(likesDoc);
-    setLikes(data.docs.length);
-    console.log(data.docs.length);
-    console.log(likes);
+    setLikes(
+      data.docs.map((doc) => ({ userId: doc.data().userId, likeId: doc.id }))
+    );
+    // console.log(likes)
   };
 
+  const hasUserLiked = likes?.find((like) => like.userId === user?.uid);
+
+  const removeLike = async () => {
+    try {
+      if (!user) {
+        navigate("/login");
+      }
+
+      const unLikeQuery = query(
+        likesRef,
+        where("commentId", "==", comment.userId),
+        where("userId", "==", user?.uid)
+      );
+
+      const unLikeData = await getDocs(unLikeQuery);
+      const likeId = unLikeData.docs[0].id;
+      const unLike = doc(db, "likes", likeId);
+      await deleteDoc(unLike);
+      if (user) {
+        setLikes(
+          (prev) => prev && prev.filter((like) => like.likeId !== likeId)
+        );
+        console.log(likes);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   // reply function
   // const handleReply = () => {
@@ -112,9 +152,22 @@ export default function Comment({ comment, commentsList, addLike }) {
         <div className="likes_reply_group flex justify-between align-center">
           <Rating
             comment={comment}
-            addLike={addLike(comment.userId)}
+            addLike={() => {
+              if (user) {
+                addLike(comment.userId);
+                setLikes((prev) =>
+                  prev
+                    ? [...prev, { userId: user.uid, likeId: newDoc.id }]
+                    : [{ userId: user?.uid, likeId: newDoc.id }]
+                );
+              }
+            }}
             likes={likes}
-            unLike={unLike}
+            unLike={() => {
+              removeLike();
+              // setLikes((prev) => prev && prev.filter((like) => like.likeId !== likeId));
+              // console.log(likeId)
+            }}
             hasUserLiked={hasUserLiked}
           />
           <section className="comment--actions flex justify-between align-center">
@@ -131,12 +184,15 @@ export default function Comment({ comment, commentsList, addLike }) {
           key={reply.id}
           addLike={addLike}
           // handleReply={handleReply}
-          unLike={unLike}
-          hasUserLiked={hasUserLiked}
+          // unLike={unLike}
+          // hasUserLiked={hasUserLiked}
         />
       ))}
     </>
   );
 }
 
-// Comm
+Comment.propTypes = {
+  comment: PropTypes.object,
+  commentsList: PropTypes.array,
+};

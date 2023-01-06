@@ -1,6 +1,14 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { useEffect } from "react";
-import { useState } from "react";
+import PropTypes from "prop-types";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DeleteBtn } from "../../components/comment/DeleteBtn";
 import { EditBtn } from "../../components/comment/EditBtn";
 import { Rating } from "../../components/comment/Rating";
@@ -8,19 +16,61 @@ import { ReplyBtn } from "../../components/comment/ReplyBtn";
 import { auth, db } from "../../config/firebase";
 import { UserAuth } from "../../context/AuthContext";
 
-export default function Reply({ reply, unLike, hasUserLiked, key, addLike }) {
+export default function Reply({ reply }) {
   const isYou = reply.username === auth.currentUser?.displayName;
-  const { handleReply } = UserAuth();
+  const { user, handleReply, addLike, newDoc } = UserAuth();
   const [likes, setLikes] = useState(null);
   const likesRef = collection(db, "likes");
+  const navigate = useNavigate();
 
   const likesDoc = query(likesRef, where("commentId", "==", reply.userId));
 
   const getLikes = async () => {
     const data = await getDocs(likesDoc);
-    setLikes(data.docs.length);
-    console.log(likes)
+    setLikes(data.docs.map((doc) => ({ userId: doc.data().userId })));
   };
+
+  const removeLike = async () => {
+    try {
+      if (!user) {
+        navigate("/login");
+      }
+      const unLikeQuery = query(
+        likesRef,
+        where("commentId", "==", reply.userId),
+        where("userId", "==", user?.uid)
+      );
+
+      const unLikeData = await getDocs(unLikeQuery);
+      const likeId = unLikeData.docs[0].id;
+      const unLike = doc(db, "likes", likeId);
+      await deleteDoc(unLike);
+      if (user) {
+        setLikes(
+          (prev) => prev && prev.filter((like) => like.likeId !== likeId)
+        );
+      }
+      console.log(likes);
+      console.log(unLikeData.docs[0].id);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // const unLike = () => {
+  //   if (hasUserLiked) {
+  //     console.log(hasUserLiked);
+  //     setLikes((prevValue) => prevValue.length - 1);
+  //     console.log(likes.length);
+  //     // console.log(likes);
+  //   } else if (!user) {
+  //     navigate("/login");
+  //   } else {
+  //     console.log("invalid");
+  //   }
+  // };
+
+  const hasUserLiked = likes?.find((like) => like.userId === user?.uid);
 
   const dayCommentIsCreatedAt = new Date(reply.createdAt).toLocaleDateString();
 
@@ -32,7 +82,7 @@ export default function Reply({ reply, unLike, hasUserLiked, key, addLike }) {
 
   return (
     <div className="replies">
-      <div className="container" key={key}>
+      <div className="container" key={reply.userId}>
         <div className="content--container">
           <div className="comment--title flex justify-between align-center">
             <section className="flex align-center">
@@ -65,9 +115,21 @@ export default function Reply({ reply, unLike, hasUserLiked, key, addLike }) {
         <div className="likes_reply_group flex justify-between align-center">
           <Rating
             reply={reply}
-            addLike={addLike(reply.userId)}
+            addLike={() => {
+              addLike(reply.userId);
+              setLikes((prev) =>
+                prev
+                  ? [...prev, { userId: user.uid, likeId: newDoc?.id }]
+                  : [{ userId: user?.uid, likeId: newDoc?.id }]
+              );
+            }}
             likes={likes}
-            unLike={unLike}
+            unLike={() => {
+              removeLike();
+              // setLikes(
+              //   (prev) => prev && prev.filter((like) => like.likeId !== likeId)
+              // );
+            }}
             hasUserLiked={hasUserLiked}
           />
           <section className="comment--actions flex justify-between align-center">
@@ -80,3 +142,7 @@ export default function Reply({ reply, unLike, hasUserLiked, key, addLike }) {
     </div>
   );
 }
+
+Reply.propTypes = {
+  reply: PropTypes.object,
+};

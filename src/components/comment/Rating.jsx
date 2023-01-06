@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
 import plusIcon from "../assets/icon-plus.svg";
 import minusIcon from "../assets/icon-minus.svg";
-import { useState } from "react";
-import { UserAuth } from '../../context/AuthContext';
+// import { useState } from "react";
+// import { UserAuth } from '../../context/AuthContext';
 
-export const Rating = ({ likes, unLike, hasUserLiked }) => {
-  const { addLike } = UserAuth();
+export const Rating = ({ addLike, likes, unLike, hasUserLiked }) => {
+  // const { addLike } = UserAuth();
   // const increaseLikeCount = () => {
   //   setLike(prevValue =>  prevValue + 1)
   // }
@@ -19,13 +19,14 @@ export const Rating = ({ likes, unLike, hasUserLiked }) => {
   return (
     <section className="likes font-bold flex justify-between align-center">
       <img
-        onClick={addLike}
-        className={` ${hasUserLiked ? `like-added` : ``} cursor-pointer`}
+        onClick={hasUserLiked ? unLike : addLike}
+        className={` ${hasUserLiked ? `` : `like-added`} cursor-pointer`}
         src={plusIcon}
         alt="icon plus"
         id="plus"
-      />
-      <span id="like">{likes ? likes : "0"}</span>
+        />
+      <span id="like">{likes ? likes.length : "0"}</span>
+      {/* {console.log(likes)} */}
       <img
         onClick={unLike}
         className={` ${hasUserLiked ? `like-added` : ``} cursor-pointer`}
@@ -38,6 +39,6 @@ export const Rating = ({ likes, unLike, hasUserLiked }) => {
 };
 
 
-// Rating.propTypes = {
-//   likes: PropTypes.number
-// }
+Rating.propTypes = {
+  likes: PropTypes.array
+}

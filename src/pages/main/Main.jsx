@@ -1,6 +1,7 @@
 import { UserAuth } from "../../context/AuthContext";
 import { getDocs, collection, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import PropTypes from 'prop-types';
 import {
   commentData,
   createComment,
@@ -21,24 +22,24 @@ export const Main = () => {
   const [commentsList, setCommentsList] = useState([]);
   const commentsRef = collection(db, "posts");
   const rootComments = commentsList?.filter((data) => data.parentId === "null");
-  const [user] = useAuthState(auth);
-  const navigate = useNavigate();
+  // const { user } = UserAuth();
+  // const navigate = useNavigate();
 
   // const getReplies = (id) => {
   //   return commentsList?.filter((data) => data.parentId === id)
   // };
 
-  const likesRef = collection(db, "likes");
+  // const likesRef = collection(db, "likes");
 
-  const addLike = async (commentId) => {
-    if (!user) {
-      navigate("/login");
-    }
-    await addDoc(likesRef, {
-      userId: user?.uid,
-      commentId: commentId,
-    });
-  };
+  // const addLike = async (commentId) => {
+  //   if (!user) {
+  //     navigate("/login");
+  //   }
+  //   await addDoc(likesRef, {
+  //     userId: user?.uid,
+  //     commentId: commentId,
+  //   });
+  // };
 
   const getComments = async () => {
     const data = await getDocs(commentsRef);
@@ -119,7 +120,7 @@ export const Main = () => {
             comment={comment}
             // replies={getReplies(commentId)}
             commentsList={commentsList}
-            addLike={addLike}
+            // addLike={addLike}
           />
         ))
       )}
@@ -148,3 +149,8 @@ export const Main = () => {
     </main>
   );
 };
+
+
+// Main.propTypes = {
+//   comment
+// }

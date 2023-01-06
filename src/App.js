@@ -11,18 +11,21 @@ function App() {
   return (
     <div className="App">
       <AuthContextProvider>
-      <Navbar />
+        <Navbar />
         <Routes>
-          <Route exact path="/" element={
-            // <ProtectedRoute>
-            <Main />
-            //  </ProtectedRoute> 
-          } />
+          <Route
+            exact
+            path="/"
+            element={
+              // <ProtectedRoute>
+              <Main />
+              //  </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/addComment" element={<AddComment />} />
         </Routes>
       </AuthContextProvider>
-      
     </div>
   );
 }

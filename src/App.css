@@ -211,6 +211,10 @@ img {
   margin-bottom: 2em;
 }
 
+.replies .container{
+  margin-bottom: 0;
+}
+
 .comment--title {
   width: 100%;
   margin-bottom: 0.7em;

@@ -26,6 +26,7 @@ export function AuthContextProvider({ children }) {
   const [user] = useAuthState(auth);
   const [likeId, setLikeId] = useState("");
   const [newDoc, setNewDoc] = useState("");
+  const [addCommentModalShown, setAddCommentModalShown] = useState(false)
 
   const likesRef = collection(db, "likes");
   const navigate = useNavigate();
@@ -100,7 +101,7 @@ export function AuthContextProvider({ children }) {
 
   return (
     <UserContext.Provider
-      value={{ handleReply, user, newDoc, addLike, removeLike, likeId }}
+      value={{ handleReply, user, newDoc, addLike, removeLike, likeId, addCommentModalShown, setAddCommentModalShown }}
     >
       {children}
     </UserContext.Provider>

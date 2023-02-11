@@ -2,13 +2,18 @@ import { auth } from "../config/firebase";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
+import { UserAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [user] = useAuthState(auth);
+  const {setAddCommentModalShown } = UserAuth();
 
   const signUserOut = async () => {
     // add a confirm modal 
-    await signOut(auth);
+    // if(confirm("Are you sure you want to sign out?")){
+
+      await signOut(auth);
+    // }
   };
   
   return (
@@ -20,7 +25,7 @@ export default function Navbar() {
             Login
           </Link>
         ): (
-          <Link to="/addComment" className="add-new-comment-btn">
+          <Link to="" onClick={() => setAddCommentModalShown(prevState => !prevState)} className="add-new-comment-btn">
             Add Comment
           </Link>
         )}

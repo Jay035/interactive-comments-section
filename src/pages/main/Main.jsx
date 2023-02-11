@@ -16,9 +16,11 @@ import { auth, db } from "../../config/firebase";
 import Comment from "./Comment";
 import Loading from "../Loading";
 import { useAuthState } from "react-firebase-hooks/auth";
+import AddCommentForm from "../addNewComment/AddCommentForm";
 
 export const Main = () => {
   const [loading, setLoading] = useState(true);
+  const {addCommentModalShown } = UserAuth();
   const [commentsList, setCommentsList] = useState([]);
   const commentsRef = collection(db, "posts");
   const rootComments = commentsList?.filter((data) => data.parentId === "null");
@@ -118,12 +120,13 @@ export const Main = () => {
         rootComments?.map((comment) => (
           <Comment
             comment={comment}
-            // replies={getReplies(commentId)}
             commentsList={commentsList}
+            // replies={getReplies(commentId)}
             // addLike={addLike}
           />
         ))
       )}
+      {addCommentModalShown ? <AddCommentForm /> : ""}
 
       {/* {rootComments.map((rootComment) => (
         <div key={rootComment.id}>
